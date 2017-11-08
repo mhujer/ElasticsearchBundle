@@ -9,6 +9,7 @@ use Elasticsearch\ClientBuilder;
 use Mhujer\ElasticsearchBundle\ClientBuilderWrapper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
 class ElasticsearchExtension extends ConfigurableExtension
@@ -23,9 +24,9 @@ class ElasticsearchExtension extends ConfigurableExtension
 		$hosts = $mergedConfig['client']['default']['hosts'];
 
 		$clientDefinition = new Definition(Client::class);
-		$clientDefinition->setFactory(ClientBuilderWrapper::class . ':buildClient');
+		$clientDefinition->setFactory(ClientBuilderWrapper::class . '::buildClient');
 		$clientDefinition->setArguments([
-			ClientBuilder::class,
+			new Reference('mhujer_elasticsearch_client_builder'),
 		]);
 		$container->setDefinition('mhujer_elasticsearch_client.default', $clientDefinition);
 
