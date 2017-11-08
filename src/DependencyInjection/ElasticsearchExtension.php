@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Mhujer\ElasticsearchBundle\DependencyInjection;
 
+use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
@@ -12,27 +14,23 @@ class ElasticsearchExtension extends ConfigurableExtension
 {
 
 	/**
-	 * Configures the passed container according to the merged configuration.
-	 *
-	 * @param array $mergedConfig
-	 * @param ContainerBuilder $container
+	 * @param mixed[][] $mergedConfig
+	 * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
 	 */
 	protected function loadInternal(array $mergedConfig, ContainerBuilder $container)
 	{
 		$hosts = $mergedConfig['client']['default']['hosts'];
 
-		$clientDefinition = new Definition(\Elasticsearch\Client::class);
-		$clientDefinition->setFactory('Elasticsearch\ClientBuilder::build');
+		$clientDefinition = new Definition(Client::class);
+		$clientDefinition->setFactory(ClientBuilder::class . '::build');
+		$container->setDefinition('mhujer_elasticsearch_client.default', $clientDefinition);
 
-		$clientBuilderDefinition = new Definition(\Elasticsearch\ClientBuilder::class);
+		$clientBuilderDefinition = new Definition(ClientBuilder::class);
 		$clientBuilderDefinition->setPublic(false);
 		$clientBuilderDefinition->addMethodCall('setHosts', [$hosts]);
 		//$clientBuilderDefinition->addMethodCall('setLogger', ['%elastic_hosts%']); // @monolog.logger.elasticsearch
 
-		$container->addDefinitions([
-				'mhujer_elasticsearch_client.default' => $clientDefinition,
-				'mhujer_elasticsearch_client_builder' => $clientBuilderDefinition,
-			]
-		);
+		$container->setDefinition('mhujer_elasticsearch_client_builder', $clientBuilderDefinition);
 	}
+
 }
