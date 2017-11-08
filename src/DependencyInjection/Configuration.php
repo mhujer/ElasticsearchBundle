@@ -13,7 +13,7 @@ class Configuration implements ConfigurationInterface
 	public function getConfigTreeBuilder(): TreeBuilder
 	{
 		$treeBuilder = new TreeBuilder();
-		$rootNode = $treeBuilder->root('mhujer_elasticsearch');
+		$rootNode = $treeBuilder->root('elasticsearch');
 
 		// @codingStandardsIgnoreStart tree is indented for better readability
 		$rootNode
